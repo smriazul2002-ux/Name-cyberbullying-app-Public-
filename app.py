@@ -45,12 +45,17 @@ st.markdown("<h3 style='text-align: center;'>Type your message below 👇</h3>",
 if st.button("🧹 Clear History"):
     st.session_state.history = []
 
-# 📥 Input
-user_input = st.text_area("Enter a sentence:")
+# 📥 Input (UPDATED)
+user_input = st.text_area(
+    "Enter a sentence:",
+    placeholder="Example: I hate you / tui kharap"
+)
 
-# 🔍 Analyze button
+# 🔍 Analyze button (UPDATED)
 if st.button("Analyze"):
-    if user_input:
+    if not user_input:
+        st.warning("⚠️ Please enter a sentence!")
+    else:
         pred, prob = predict(user_input)
 
         # 😡😊 Result
