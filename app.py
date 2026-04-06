@@ -2,10 +2,16 @@ import streamlit as st
 import pickle
 import re
 import string
+import os
 
-# Load model & vectorizer
-model = pickle.load(open("cyberbullying_model.pkl", "rb"))
-vectorizer = pickle.load(open("tfidf_vectorizer.pkl", "rb"))
+# Load model & vectorizer (FIXED PATH)
+BASE_DIR = os.path.dirname(__file__)
+
+model_path = os.path.join(BASE_DIR, "cyberbullying_model.pkl")
+vectorizer_path = os.path.join(BASE_DIR, "tfidf_vectorizer.pkl")
+
+model = pickle.load(open(model_path, "rb"))
+vectorizer = pickle.load(open(vectorizer_path, "rb"))
 
 # Text cleaning
 def clean_text(text):
