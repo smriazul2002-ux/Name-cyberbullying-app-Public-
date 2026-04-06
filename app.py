@@ -4,16 +4,17 @@ import re
 import string
 import os
 
-# Load model & vectorizer (FIXED PATH)
+# 📝 History setup
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+# 📦 Load model
 BASE_DIR = os.path.dirname(__file__)
 
-model_path = os.path.join(BASE_DIR, "cyberbullying_model.pkl")
-vectorizer_path = os.path.join(BASE_DIR, "tfidf_vectorizer.pkl")
+model = pickle.load(open(os.path.join(BASE_DIR, "cyberbullying_model.pkl"), "rb"))
+vectorizer = pickle.load(open(os.path.join(BASE_DIR, "tfidf_vectorizer.pkl"), "rb"))
 
-model = pickle.load(open(model_path, "rb"))
-vectorizer = pickle.load(open(vectorizer_path, "rb"))
-
-# Text cleaning
+# 🧹 Clean text
 def clean_text(text):
     text = str(text).lower()
     text = re.sub(r"http\S+", "", text)
@@ -21,16 +22,24 @@ def clean_text(text):
     text = text.translate(str.maketrans('', '', string.punctuation))
     return text
 
-# Prediction function
+# 🌍 Simple translation (optional)
+def translate_text(text):
+    if "tui" in text or "tor" in text:
+        return "bad language"
+    return text
+
+# 🤖 Prediction
 def predict(text):
+    text = translate_text(text)
     text = clean_text(text)
     text_tfidf = vectorizer.transform([text])
     prediction = model.predict(text_tfidf)[0]
     prob = model.predict_proba(text_tfidf)[0][1]
     return prediction, prob
 
-# UI
-st.title("🚫 Cyberbullying Detection App")
+# 🎨 UI
+st.title("🚫😡 Cyberbullying Detection App")
+st.markdown("### AI Powered Cyberbullying Detector 🔥")
 
 user_input = st.text_area("Enter a sentence:")
 
@@ -38,7 +47,22 @@ if st.button("Analyze"):
     if user_input:
         pred, prob = predict(user_input)
 
+        # 😡😊 Result
         if pred == 1:
-            st.error(f"Cyberbullying ❌ ({round(prob*100,2)}%)")
+            st.error(f"😡 Cyberbullying ({round(prob*100,2)}%)")
         else:
-            st.success(f"Not Cyberbullying ✅ ({round(prob*100,2)}%)")
+            st.success(f"😊 Not Cyberbullying ({round(prob*100,2)}%)")
+
+        # 📊 Confidence bar
+        st.progress(int(prob * 100))
+        st.write(f"Confidence: {round(prob*100,2)}%")
+
+        # 📝 Save history
+        st.session_state.history.append((user_input, pred, prob))
+
+# 📜 History display
+st.subheader("📝 History")
+
+for text, p, pr in st.session_state.history:
+    label = "😡 Cyberbullying" if p == 1 else "😊 Not Cyberbullying"
+    st.write(f"{text} → {label} ({round(pr*100,2)}%)")
