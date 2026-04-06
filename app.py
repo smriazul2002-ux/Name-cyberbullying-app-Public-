@@ -37,12 +37,18 @@ def predict(text):
     prob = model.predict_proba(text_tfidf)[0][1]
     return prediction, prob
 
-# 🎨 UI
-st.title("🚫😡 Cyberbullying Detection App")
-st.markdown("### AI Powered Cyberbullying Detector 🔥")
+# 🎨 UI (TOP PART)
+st.title("🚫😡 AI Cyberbullying Detector 🔥")
+st.markdown("<h3 style='text-align: center;'>Type your message below 👇</h3>", unsafe_allow_html=True)
 
+# 🧹 Clear history button
+if st.button("🧹 Clear History"):
+    st.session_state.history = []
+
+# 📥 Input
 user_input = st.text_area("Enter a sentence:")
 
+# 🔍 Analyze button
 if st.button("Analyze"):
     if user_input:
         pred, prob = predict(user_input)
